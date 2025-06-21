@@ -62,6 +62,7 @@ const priorityOptions = ref(priorityOptionsList)
 const emit = defineEmits<{
   (e: 'add-todo', payload: BaseTodo): void
   (e: 'update-todo', payload: Todo): void
+  (e: 'form-submitted'): void
 }>()
 
 watch(
@@ -118,9 +119,17 @@ const handleSubmit = () => {
     })
   }
 
+  emit('form-submitted')
+}
+
+const clearForm = () => {
   todoText.value = ''
   todoPriority.value = ''
   textError.value = null
   priorityError.value = null
 }
+
+defineExpose({
+  clearForm,
+})
 </script>

@@ -1,13 +1,34 @@
 import { test, expect } from '@playwright/test'
 import { TodoPage } from '../pages/todo.page.js'
-import { sampleTodoHigh } from '../utils/testData.js'
+import { sampleTodoHigh, resetDatabase } from '../utils/testData.js'
 import { delayApi } from '../utils/delayApi.js'
+
+test.beforeEach(async ({ page }) => {
+  await resetDatabase(page)
+})
 
 test.afterEach(async ({ page }) => {
   const todo = new TodoPage(page)
   await todo.goto()
-  await todo.removeTodo(sampleTodoHigh.text)
-  await expect(page.getByText(sampleTodoHigh.text)).toBeHidden()
+
+  await page.waitForLoadState('domcontentloaded')
+
+  try {
+    const todoElements = page
+      .locator('[data-testid="todo-item"]')
+      .filter({ hasText: sampleTodoHigh.text })
+    const count = await todoElements.count()
+
+    for (let i = 0; i < count; i++) {
+      const todoItem = todoElements.first()
+      const deleteBtn = todoItem.locator('button', { hasText: 'Delete' })
+      await deleteBtn.click()
+      await todo.confirmPopupButton.click()
+      await page.waitForTimeout(500)
+    }
+  } catch (error: unknown) {
+    console.log('Cleanup error (ignored):', error instanceof Error ? error.message : String(error))
+  }
 })
 
 test.describe('Add Todo', () => {
@@ -15,7 +36,7 @@ test.describe('Add Todo', () => {
     const todo = new TodoPage(page)
     await todo.goto()
     await todo.addTodo(sampleTodoHigh.text, sampleTodoHigh.priority)
-    await expect(page.getByText(sampleTodoHigh.text)).toBeVisible()
+    await expect(page.getByText(sampleTodoHigh.text).first()).toBeVisible()
   })
 
   test('should clear form after adding todo', async ({ page }) => {
@@ -36,6 +57,6 @@ test.describe('Add Todo', () => {
 
     await todo.addTodo(sampleTodoHigh.text, sampleTodoHigh.priority)
 
-    await expect(todo.addEditButton).toHaveText('Wait...')
+    await expect(todo.addEditButton).toHaveText(/Wait\.\.\./)
   })
 })

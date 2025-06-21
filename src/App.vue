@@ -2,6 +2,7 @@
   <TheHeader />
   <TheContainer>
     <TodoForm
+      ref="todoFormRef"
       @add-todo="addTodoItem"
       @update-todo="onUpdateTodo"
       :todoToEdit="todoToEdit"
@@ -46,6 +47,7 @@ const { request: deleteTodo, loading: loadingDelete } = useApi<{ id: string }, v
 const isConfirmOpen = ref(false)
 const confirmDeleteId = ref<string | null>(null)
 const todoToEdit = ref<Todo | null>(null)
+const todoFormRef = ref<InstanceType<typeof TodoForm> | null>(null)
 
 onMounted(() => {
   getTodos({ url: '/todos', method: 'GET' })
@@ -68,6 +70,7 @@ const addTodoItem = async (todo: BaseTodo) => {
   const res = await addEditTodo({ url: '/todos', method: 'POST', data: newTodo })
   if (res) {
     todos.value = [res, ...(todos.value ?? [])]
+    todoFormRef.value?.clearForm()
   }
 }
 
@@ -88,6 +91,7 @@ const onUpdateTodo = async (updated: Todo) => {
     const index = todos.value.findIndex((t) => t.id === updated.id)
     todos.value = [...todos.value.slice(0, index), res, ...todos.value.slice(index + 1)]
     todoToEdit.value = null
+    todoFormRef.value?.clearForm()
   }
 }
 

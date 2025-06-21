@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { TodoPage } from '../pages/todo.page.js'
-import { sampleTodoHigh } from '../utils/testData.js'
+import { sampleTodoHigh, resetDatabase } from '../utils/testData.js'
+
+test.beforeEach(async ({ page }) => {
+  await resetDatabase(page)
+})
 
 test.describe('Delete Todo', () => {
   test('user can delete a todo', async ({ page }) => {
@@ -8,8 +12,8 @@ test.describe('Delete Todo', () => {
     await todo.goto()
 
     await todo.addTodo(sampleTodoHigh.text, sampleTodoHigh.priority)
-    await expect(page.getByText(sampleTodoHigh.text)).toBeVisible()
+    await expect(page.getByText(sampleTodoHigh.text).first()).toBeVisible()
     await todo.removeTodo(sampleTodoHigh.text)
-    await expect(page.getByText(sampleTodoHigh.text)).toBeHidden()
+    await expect(page.getByText(sampleTodoHigh.text).first()).toBeHidden()
   })
 })
