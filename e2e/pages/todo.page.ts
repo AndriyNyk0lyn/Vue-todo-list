@@ -47,5 +47,7 @@ export class TodoPage {
 
     await this.confirmPopupButton.waitFor({ state: 'visible' })
     await this.confirmPopupButton.click()
+
+    await this.page.locator('#confirm-popup').waitFor({ state: 'hidden' })
   }
 }

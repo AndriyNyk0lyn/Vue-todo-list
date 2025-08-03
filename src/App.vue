@@ -97,8 +97,10 @@ const onUpdateTodo = async (updated: Todo) => {
 
 const confirmDelete = async () => {
   if (!confirmDeleteId.value) return
-  await deleteTodo({ url: `/todos/${confirmDeleteId.value}`, method: 'DELETE' })
-  todos.value = todos.value?.filter((t) => t.id !== confirmDeleteId.value) ?? []
+  const result = await deleteTodo({ url: `/todos/${confirmDeleteId.value}`, method: 'DELETE' })
+  if (result !== null) {
+    todos.value = todos.value?.filter((t) => t.id !== confirmDeleteId.value) ?? []
+  }
   isConfirmOpen.value = false
   confirmDeleteId.value = null
 }
