@@ -44,6 +44,8 @@ export class TodoPage {
     const todoItem = this.todoItems.filter({ hasText: text }).first()
     const deleteBtn = todoItem.locator('button', { hasText: 'Delete' })
     await deleteBtn.click()
+
+    await this.confirmPopupButton.waitFor({ state: 'visible' })
     await this.confirmPopupButton.click()
   }
 }
