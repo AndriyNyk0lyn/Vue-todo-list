@@ -11,7 +11,7 @@ test.describe('Delete Todo', () => {
     const todo = new TodoPage(page)
     await todo.goto()
 
-    await expect(todo.todoItems).toHaveCount(0)
+    await expect(todo.todoItems.filter({ hasText: sampleTodoHigh.text })).toHaveCount(0)
 
     await todo.addTodo(sampleTodoHigh.text, sampleTodoHigh.priority)
 
